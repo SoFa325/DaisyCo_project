@@ -43,4 +43,12 @@ public class Product {
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public void update(String description, double price, boolean in_sight){
+        this.description = description;
+        this.price = price;
+        this.in_sight = in_sight;
+    }
+
+
 }

@@ -1,23 +1,44 @@
 package com.example.restservice_demo;
-
-
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 
 @RestController
 public class ProductController {
+    HashMap<String, Product> products = new HashMap<>();
 
-    @RequestMapping(value="/create", produces="application/json")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
-    @ResponseBody
-    public Product createProduct(@RequestParam("name") String name, @RequestParam(name = "description", defaultValue = "") String description, @RequestParam(name = "price", defaultValue = "0.0") double price,@RequestParam(defaultValue = "false") boolean in_sight) {
-        if (name.length() >255){
-            return null;
+    @RequestMapping(value="/create")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
+    public void createProduct(@RequestParam("name") String name, @RequestParam(name = "description", defaultValue = "") String description, @RequestParam(name = "price", defaultValue = "0.0") double price,@RequestParam(defaultValue = "false") boolean in_sight) {
+        if (name.length() <=255) {
+            if (description.length() > 4096) {
+                description = description.substring(0, 4097);
+            }
+            if (price < 0.0) {
+                price = 0.0;
+            }
+            //System.out.println("create"+ name);
+            if (this.products.containsKey(name)){
+                this.products.get(name).update(description,price,in_sight);
+            }else {
+                this.products.put(name, new Product(name, description, price, in_sight));
+            }
         }
-        if (description.length() > 4096){
-            description = description.substring(0, 4097);
+    }
+
+    @RequestMapping(value="/update")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
+    public void updateProduct(@RequestParam("name") String name, @RequestParam(name = "property") String property, @RequestParam(name = "value") String value) {
+        if (this.products.containsKey(name)){
+            //System.out.println("update"+ name);
+            switch (property) {
+                case "description":
+                    this.products.get(name).setDescription(value);
+                    break;
+                case "price":
+                    this.products.get(name).setPrice(Double.parseDouble(value));
+                    break;
+                case "in_sight":
+                    this.products.get(name).setIn_sight(Boolean.parseBoolean(value));
+                    break;
+            }
         }
-        if (price < 0.0){
-            price = 0.0;
-        }
-        return new Product(name, description, price, in_sight);
     }
 }
