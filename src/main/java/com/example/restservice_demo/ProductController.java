@@ -24,7 +24,7 @@ public class ProductController {
         }
     }
 
-    @RequestMapping(value="/update")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
+    @RequestMapping(value="/update")//http://localhost:8080/update?name=cavier&property=price&value=12
     public void updateProduct(@RequestParam("name") String name, @RequestParam(name = "property") String property, @RequestParam(name = "value") String value) {
         if (this.products.containsKey(name)){
             //System.out.println("update"+ name);
@@ -39,6 +39,14 @@ public class ProductController {
                     this.products.get(name).setIn_sight(Boolean.parseBoolean(value));
                     break;
             }
+        }
+    }
+
+    @RequestMapping(value="/delete")//http://localhost:8080/delete?name=cavier
+    public void deleteProduct(@RequestParam("name") String name) {
+        if (this.products.containsKey(name)){
+            System.out.println("delete"+ name);
+            this.products.remove(name);
         }
     }
 }
