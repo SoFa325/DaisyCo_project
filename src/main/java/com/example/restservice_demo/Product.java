@@ -13,7 +13,7 @@ public class Product {
     String name;
     @Column(columnDefinition = "varchar(4096)")
     String description;
-    @Column(columnDefinition = "double precision default 0.0 CHECK(price > 0.0)")
+    @Column(columnDefinition = "double precision default 0.0 CHECK(price >= 0.0)")
     double price;
     @Column(columnDefinition = "boolean default false")
     boolean in_sight;

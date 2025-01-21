@@ -1,28 +1,23 @@
 package com.example.restservice_demo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProductController {
-    //HashMap<String, Product> products = new HashMap<>();
     @Autowired
     private ProductRepository productRep;
 
-    /*@RequestMapping(value="/getProduct", produces="application/json")
+    @RequestMapping(value="/getProduct", produces="application/json")
     @ResponseBody
-    public Product getProduct(@RequestParam("name") String name) {
-        if (this.products.containsKey(name)){
-            return this.products.get(name);
-        }
-        return null;
+    public Optional<Product> getProduct(@RequestParam("name") String name) {
+        return this.productRep.findById(name);
     }
     @RequestMapping(value="/get", produces="application/json")
     @ResponseBody
-    public List<Product> getProducts() {
-        return this.products.values().stream().toList();
-    }*/
+    public Iterable<Product> getProducts() {
+        return this.productRep.findAll();
+    }
 
     @RequestMapping(value="/create")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
     public void createProduct(@RequestParam("name") String name, @RequestParam(name = "description", defaultValue = "") String description, @RequestParam(name = "price", defaultValue = "0.0") double price,@RequestParam(defaultValue = "false") boolean in_sight) {
@@ -34,25 +29,29 @@ public class ProductController {
             if (price < 0.0) {
                 price = 0.0;
             }
-
+            //System.out.println(name+description+price);
             p = new Product(name, description, price, in_sight);
             productRep.save(p);
         }
     }
 
-    /*@RequestMapping(value="/update")//http://localhost:8080/update?name=cavier&property=price&value=12
+    @RequestMapping(value="/update")//http://localhost:8080/update?name=cavier&property=price&value=12
     public void updateProduct(@RequestParam("name") String name, @RequestParam(name = "property") String property, @RequestParam(name = "value") String value) {
-        if (this.products.containsKey(name)){
+        Optional<Product> p = this.productRep.findById(name);
+        if (p.isPresent()){
             //System.out.println("update"+ name);
             switch (property) {
                 case "description":
-                    this.products.get(name).setDescription(value);
+                    p.get().setDescription(value);
+                    this.productRep.save(p.get());
                     break;
                 case "price":
-                    this.products.get(name).setPrice(Double.parseDouble(value));
+                    p.get().setPrice(Double.parseDouble(value));
+                    this.productRep.save(p.get());
                     break;
                 case "in_sight":
-                    this.products.get(name).setIn_sight(Boolean.parseBoolean(value));
+                    p.get().setIn_sight(Boolean.parseBoolean(value));
+                    this.productRep.save(p.get());
                     break;
             }
         }
@@ -60,9 +59,6 @@ public class ProductController {
 
     @RequestMapping(value="/delete")//http://localhost:8080/delete?name=cavier
     public void deleteProduct(@RequestParam("name") String name) {
-        if (this.products.containsKey(name)){
-            //System.out.println("delete"+ name);
-            this.products.remove(name);
-        }
-    }*/
+        this.productRep.deleteById(name);
+    }
 }
