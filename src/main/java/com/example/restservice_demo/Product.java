@@ -16,15 +16,15 @@ public class Product {
     @Column(columnDefinition = "double precision default 0.0 CHECK(price >= 0.0)")
     double price;
     @Column(columnDefinition = "boolean default false")
-    boolean in_sight;
+    boolean inSight;
 
     protected Product() {}
 
-    Product (String name, String description, double price, boolean in_sight){
+    Product (String name, String description, double price, boolean inSight){
         this.name = name;
         this.description = description;
         this.price = price;
-        this.in_sight = in_sight;
+        this.inSight = inSight;
     }
 
     public double getPrice() {
@@ -39,12 +39,12 @@ public class Product {
         return name;
     }
 
-    public boolean isIn_sight() {
-        return in_sight;
+    public boolean isInSight() {
+        return inSight;
     }
 
-    public void setIn_sight(boolean in_sight) {
-        this.in_sight = in_sight;
+    public void setInSight(boolean inSight) {
+        this.inSight = inSight;
     }
 
     public void setDescription(String description) {
@@ -62,7 +62,7 @@ public class Product {
     public void update(String description, double price, boolean in_sight){
         this.description = description;
         this.price = price;
-        this.in_sight = in_sight;
+        this.inSight = in_sight;
     }
 
 

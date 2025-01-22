@@ -15,7 +15,46 @@ public class ProductController {
     }
     @RequestMapping(value="/get", produces="application/json")
     @ResponseBody
-    public Iterable<Product> getProducts() {
+    public Iterable<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter) {
+        String field;
+        if (!filter.isEmpty() && !sorter.isEmpty()){
+            //TODO
+        } else if(!filter.isEmpty()){
+            String[] s = filter.split("!");
+            if (s.length != 2){
+                return null;
+            }
+            filter = s[0];
+            field = s[1];
+            try {
+                switch (filter) {
+                    case "name":
+                        return this.productRep.findByNameContaining(s[1]);
+                    case "price":
+                        if (field.charAt(0) == '>') {
+                            return this.productRep.findByPriceGreaterThan(Double.parseDouble(field.substring(1)));
+                        } else if (field.charAt(0) == '<') {
+                            return this.productRep.findByPriceLessThan(Double.parseDouble(field.substring(1)));
+                        } else {
+                            return this.productRep.findByPrice(Double.parseDouble(field));
+                        }
+                    case "in_sight":
+                        return this.productRep.findByInSight(Boolean.parseBoolean(field));
+                }
+            } catch(NumberFormatException e){
+                System.out.println(e);
+                return null;
+            }
+        }else if(!sorter.isEmpty()){
+            switch (sorter) {
+                case "name":
+                    return this.productRep.findByOrderByNameAsc();
+                case "price":
+                    return this.productRep.findByOrderByPriceAsc();
+                default:
+                    return null;
+            }
+        }
         return this.productRep.findAll();
     }
 
@@ -50,7 +89,7 @@ public class ProductController {
                     this.productRep.save(p.get());
                     break;
                 case "in_sight":
-                    p.get().setIn_sight(Boolean.parseBoolean(value));
+                    p.get().setInSight(Boolean.parseBoolean(value));
                     this.productRep.save(p.get());
                     break;
             }
