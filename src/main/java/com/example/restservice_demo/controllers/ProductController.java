@@ -62,7 +62,7 @@ public class ProductController {
     }
 
     @RequestMapping(value="/create")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
-    public void createProduct(@RequestParam("name") String name, @RequestParam(name = "description", defaultValue = "") String description, @RequestParam(name = "price", defaultValue = "0.0") double price,@RequestParam(defaultValue = "false") boolean in_sight) {
+    public void createProduct(@RequestParam("name") String name, @RequestParam(name = "description", defaultValue = "") String description, @RequestParam(name = "price", defaultValue = "0.0") double price,@RequestParam(defaultValue = "0") long amount) {
         Product p;
         if (name.length() <=255) {
             if (description.length() > 4096) {
@@ -72,7 +72,7 @@ public class ProductController {
                 price = 0.0;
             }
             //System.out.println(name+description+price);
-            p = new Product(name, description, price, in_sight);
+            p = new Product(name, description, price, amount);
             productRep.save(p);
         }
     }
@@ -93,6 +93,10 @@ public class ProductController {
                     break;
                 case "in_sight":
                     p.get().setInSight(Boolean.parseBoolean(value));
+                    this.productRep.save(p.get());
+                    break;
+                case "amount":
+                    p.get().setAmount(Long.parseLong(value));
                     this.productRep.save(p.get());
                     break;
             }

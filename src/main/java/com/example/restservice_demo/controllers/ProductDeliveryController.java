@@ -1,4 +1,5 @@
 package com.example.restservice_demo.controllers;
+import com.example.restservice_demo.entities.Product;
 import com.example.restservice_demo.entities.ProductDelivery;
 import com.example.restservice_demo.repositories.ProductDeliveryRepository;
 import com.example.restservice_demo.repositories.ProductRepository;
@@ -29,7 +30,14 @@ public class ProductDeliveryController {
     public void createProductDelivery(@RequestParam("name") String name, @RequestParam(name = "productName") String productName, @RequestParam(name = "amount") long amount) {
         ProductDelivery d;
         if (name.length() <=255 && amount >0) {
-            d = new ProductDelivery(name,this.productRep.findByName(productName), amount);
+            Product p = this.productRep.findByName(productName);
+            //System.out.println(p.getAmount());
+            if (p.getAmount() == 0){
+                p.setInSight(true);
+            }
+            p.setAmount(p.getAmount()+amount);
+            //System.out.println(p.getAmount());
+            d = new ProductDelivery(name,p, amount);
             deliveryRep.save(d);
         }
     }
