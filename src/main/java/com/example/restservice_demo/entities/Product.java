@@ -1,8 +1,7 @@
-package com.example.restservice_demo;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+package com.example.restservice_demo.entities;
+import jakarta.persistence.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name="products")
@@ -10,17 +9,19 @@ public class Product {
 
     @Id
     @Column(columnDefinition = "varchar(255)", nullable = false, unique = true)
-    String name;
+    private String name;
     @Column(columnDefinition = "varchar(4096)")
-    String description;
+    private String description;
     @Column(columnDefinition = "double precision default 0.0 CHECK(price >= 0.0)")
-    double price;
+    private double price;
     @Column(columnDefinition = "boolean default false")
-    boolean inSight;
+    private boolean inSight;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    private Set<ProductDelivery> productDeliveries;
 
     protected Product() {}
 
-    Product (String name, String description, double price, boolean inSight){
+    public Product (String name, String description, double price, boolean inSight){
         this.name = name;
         this.description = description;
         this.price = price;
@@ -58,12 +59,5 @@ public class Product {
     public void setPrice(double price) {
         this.price = price;
     }
-
-    public void update(String description, double price, boolean in_sight){
-        this.description = description;
-        this.price = price;
-        this.inSight = in_sight;
-    }
-
 
 }

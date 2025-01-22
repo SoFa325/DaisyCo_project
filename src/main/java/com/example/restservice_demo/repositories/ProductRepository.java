@@ -1,7 +1,8 @@
-package com.example.restservice_demo;
+package com.example.restservice_demo.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.restservice_demo.entities.Product;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ProductRepository extends CrudRepository<Product, String> {
@@ -17,4 +18,5 @@ public interface ProductRepository extends CrudRepository<Product, String> {
     List<Product> findByOrderByNameAsc();
     List<Product> findByOrderByPriceAsc();
 
+    Product findByName(String name);
 }

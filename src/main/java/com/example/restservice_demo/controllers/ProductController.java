@@ -1,9 +1,12 @@
-package com.example.restservice_demo;
+package com.example.restservice_demo.controllers;
+import com.example.restservice_demo.entities.Product;
+import com.example.restservice_demo.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/product")
 public class ProductController {
     @Autowired
     private ProductRepository productRep;
