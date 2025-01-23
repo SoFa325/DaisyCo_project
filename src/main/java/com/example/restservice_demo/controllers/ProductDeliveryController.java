@@ -32,16 +32,18 @@ public class ProductDeliveryController {
     public void createProductDelivery(@RequestParam("name") String name, @RequestParam(name = "productName") String productName, @RequestParam(name = "amount") long amount) {
         ProductDelivery d;
         if (name.length() <=255 && amount >0) {
-            Page<Product> p1 = this.productRep.findByName(productName, PageRequest.of(0, 100));
-            Product p = p1.getContent().get(0);
+            Optional<Product> p1 = this.productRep.findByName(productName);
             //System.out.println(p.getAmount());
-            if (p.getAmount() == 0){
-                p.setInSight(true);
+            if (p1.isPresent()) {
+                Product p = p1.get();
+                if (p.getAmount() == 0) {
+                    p.setInSight(true);
+                }
+                p.setAmount(p.getAmount() + amount);
+                //System.out.println(p.getAmount());
+                d = new ProductDelivery(name, p, amount);
+                deliveryRep.save(d);
             }
-            p.setAmount(p.getAmount()+amount);
-            //System.out.println(p.getAmount());
-            d = new ProductDelivery(name,p, amount);
-            deliveryRep.save(d);
         }
     }
     @RequestMapping(value="/update")//http://localhost:8080/productDelivery/update?name=caviardel&property=amount&value=120
@@ -51,8 +53,11 @@ public class ProductDeliveryController {
             //System.out.println("update"+ name);
             switch (property) {
                 case "productName":
-                    d.get().setProduct(this.productRep.findByName(value, PageRequest.of(0, 100)).getContent().get(0));
-                    this.deliveryRep.save(d.get());
+                    Optional<Product> p1 = this.productRep.findByName(value);
+                    if (p1.isPresent()) {
+                        d.get().setProduct(p1.get());
+                        this.deliveryRep.save(d.get());
+                    }
                     break;
                 case "amount":
                     d.get().setAmount(Long.parseLong(value));

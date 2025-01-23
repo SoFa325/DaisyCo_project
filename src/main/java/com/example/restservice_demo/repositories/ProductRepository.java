@@ -3,7 +3,6 @@ import java.util.Optional;
 
 import com.example.restservice_demo.entities.Product;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
@@ -29,6 +28,6 @@ public interface ProductRepository extends CrudRepository<Product, String> {
     Page<Product> findByOrderByNameAsc(Pageable pageable);
     Page<Product> findByOrderByPriceAsc(Pageable pageable);
     Page<Product> findByPrice(double price, Pageable pageable);
-
+    Optional<Product> findByName(String productName);
     Page<Product> findByName(String productName, Pageable pageable);
 }

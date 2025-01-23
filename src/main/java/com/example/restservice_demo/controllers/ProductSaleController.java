@@ -31,15 +31,18 @@ public class ProductSaleController {
     public void createProductSale(@RequestParam("name") String name, @RequestParam(name = "productName") String productName, @RequestParam(name = "amount") long amount) {
         ProductSale s;
         if (name.length() <=255 && amount >0) {
-            Product p = this.productRep.findByName(productName, PageRequest.of(0, 100)).getContent().get(0);
-            long a = p.getAmount()-amount;
-            if (a>=0) {
-                p.setInSight(a>0);
-                //System.out.println(p.getAmount());
-                p.setAmount(p.getAmount() - amount);
-                //System.out.println(p.getAmount());
-                s = new ProductSale(name, p, amount);
-                saleRep.save(s);
+            Optional<Product> p1 = this.productRep.findByName(productName);
+            if (p1.isPresent()) {
+                Product p = p1.get();
+                long a = p.getAmount() - amount;
+                if (a >= 0) {
+                    p.setInSight(a > 0);
+                    //System.out.println(p.getAmount());
+                    p.setAmount(p.getAmount() - amount);
+                    //System.out.println(p.getAmount());
+                    s = new ProductSale(name, p, amount);
+                    saleRep.save(s);
+                }
             }
         }
     }
@@ -50,8 +53,12 @@ public class ProductSaleController {
             //System.out.println("update"+ name);
             switch (property) {
                 case "productName":
-                    s.get().setProduct(this.productRep.findByName(value, PageRequest.of(0, 100)).getContent().get(0));
-                    this.saleRep.save(s.get());
+                    Optional<Product> p1 = this.productRep.findByName(value);
+                    if (p1.isPresent()) {
+                        Product p = p1.get();
+                        s.get().setProduct(p);
+                        this.saleRep.save(s.get());
+                    }
                     break;
                 case "amount":
                     s.get().setAmount(Long.parseLong(value));
