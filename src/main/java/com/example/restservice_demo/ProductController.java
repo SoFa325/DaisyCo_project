@@ -5,7 +5,7 @@ import java.util.List;
 
 @RestController
 public class ProductController {
-    HashMap<String, Product> products = new HashMap<>();
+    public HashMap<String, Product> products = new HashMap<>();
 
     @RequestMapping(value="/getProduct", produces="application/json")
     @ResponseBody
