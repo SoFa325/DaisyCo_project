@@ -22,7 +22,7 @@ public class ProductController {
     }
     @RequestMapping(value="/get", produces="application/json")
     @ResponseBody
-    public List<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter, @RequestParam(name="limit", defaultValue = "3") Integer limit) {
+    public List<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter, @RequestParam(name="limit", defaultValue = "100") Integer limit) {
         Pageable pageable = PageRequest.of(0, limit);
         String field;
         if (!filter.isEmpty() && !sorter.isEmpty()){
