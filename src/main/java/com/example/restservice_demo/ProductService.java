@@ -1,5 +1,8 @@
 package com.example.restservice_demo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +12,7 @@ public class ProductService {
     @Autowired
     private ProductRepository productRep;
 
-    public List<Product> filterBy(String filter){
+    public Page<Product> filterBy(String filter, Pageable pageable){
         String[] s = filter.split("!");
         if (s.length != 2){
             return null;
@@ -19,17 +22,17 @@ public class ProductService {
         try {
             switch (filter) {
                 case "name":
-                    return this.productRep.findByNameContaining(s[1]);
+                    return this.productRep.findByNameContaining(s[1], pageable);
                 case "price":
                     if (field.charAt(0) == '>') {
-                        return this.productRep.findByPriceGreaterThan(Double.parseDouble(field.substring(1)));
+                        return this.productRep.findByPriceGreaterThan(Double.parseDouble(field.substring(1)), pageable);
                     } else if (field.charAt(0) == '<') {
-                        return this.productRep.findByPriceLessThan(Double.parseDouble(field.substring(1)));
+                        return this.productRep.findByPriceLessThan(Double.parseDouble(field.substring(1)), pageable);
                     } else {
-                        return this.productRep.findByPrice(Double.parseDouble(field));
+                        return this.productRep.findByPrice(Double.parseDouble(field), pageable);
                     }
                 case "in_sight":
-                    return this.productRep.findByInSight(Boolean.parseBoolean(field));
+                    return this.productRep.findByInSight(Boolean.parseBoolean(field), pageable);
             }
         } catch(NumberFormatException e){
             System.out.println(e);
@@ -38,18 +41,18 @@ public class ProductService {
         return null;
     }
 
-    public List<Product> sortBy(String sorter){
+    public Page<Product> sortBy(String sorter, Pageable pageable){
         switch (sorter) {
             case "name":
-                return this.productRep.findByOrderByNameAsc();
+                return this.productRep.findByOrderByNameAsc(pageable);
             case "price":
-                return this.productRep.findByOrderByPriceAsc();
+                return this.productRep.findByOrderByPriceAsc(pageable);
             default:
                 return null;
         }
     }
 
-    public List<Product> filterByAndSort(String filter, String sorter){
+    public Page<Product> filterByAndSort(String filter, String sorter, Pageable pageable){
         String[] s = filter.split("!");
         if (s.length != 2){
             return null;
@@ -61,53 +64,53 @@ public class ProductService {
                 case "name":
                     switch (sorter) {
                         case "name":
-                            return this.productRep.findByNameContainingOrderByNameAsc(s[1]);
+                            return this.productRep.findByNameContainingOrderByNameAsc(s[1], pageable);
                         case "price":
-                            return this.productRep.findByNameContainingOrderByPriceAsc(s[1]);
+                            return this.productRep.findByNameContainingOrderByPriceAsc(s[1], pageable);
                         default:
-                            return this.productRep.findByNameContaining(s[1]);
+                            return this.productRep.findByNameContaining(s[1], pageable);
                     }
                 case "price":
                     if (field.charAt(0) == '>') {
                         double temp = Double.parseDouble(field.substring(1));
                         switch (sorter) {
                             case "name":
-                                return this.productRep.findByPriceGreaterThanOrderByNameAsc(temp);
+                                return this.productRep.findByPriceGreaterThanOrderByNameAsc(temp, pageable);
                             case "price":
-                                return this.productRep.findByPriceGreaterThanOrderByPriceAsc(temp);
+                                return this.productRep.findByPriceGreaterThanOrderByPriceAsc(temp, pageable);
                             default:
-                                return this.productRep.findByPriceGreaterThan(temp);
+                                return this.productRep.findByPriceGreaterThan(temp, pageable);
                         }
                     } else if (field.charAt(0) == '<') {
                         double temp = Double.parseDouble(field.substring(1));
                         switch (sorter) {
                             case "name":
-                                return this.productRep.findByPriceLessThanOrderByNameAsc(temp);
+                                return this.productRep.findByPriceLessThanOrderByNameAsc(temp, pageable);
                             case "price":
-                                return this.productRep.findByPriceLessThanOrderByPriceAsc(temp);
+                                return this.productRep.findByPriceLessThanOrderByPriceAsc(temp, pageable);
                             default:
-                                return this.productRep.findByPriceLessThan(temp);
+                                return this.productRep.findByPriceLessThan(temp, pageable);
                         }
                     } else {
                         double temp = Double.parseDouble(field);
                         switch (sorter) {
                             case "name":
-                                return this.productRep.findByPriceOrderByNameAsc(temp);
+                                return this.productRep.findByPriceOrderByNameAsc(temp, pageable);
                             case "price":
-                                return this.productRep.findByPriceOrderByPriceAsc(temp);
+                                return this.productRep.findByPriceOrderByPriceAsc(temp, pageable);
                             default:
-                                return this.productRep.findByPrice(temp);
+                                return this.productRep.findByPrice(temp, pageable);
                         }
                     }
                 case "in_sight":
                     boolean temp = Boolean.parseBoolean(field);
                     switch (sorter) {
                         case "name":
-                            return this.productRep.findByInSightOrderByNameAsc(temp);
+                            return this.productRep.findByInSightOrderByNameAsc(temp, pageable);
                         case "price":
-                            return this.productRep.findByInSightOrderByPriceAsc(temp);
+                            return this.productRep.findByInSightOrderByPriceAsc(temp, pageable);
                         default:
-                            return this.productRep.findByInSight(temp);
+                            return this.productRep.findByInSight(temp, pageable);
                     }
             }
         } catch(NumberFormatException e){

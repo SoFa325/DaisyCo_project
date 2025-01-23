@@ -1,6 +1,10 @@
 package com.example.restservice_demo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,16 +22,17 @@ public class ProductController {
     }
     @RequestMapping(value="/get", produces="application/json")
     @ResponseBody
-    public Iterable<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter) {
+    public List<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter, @RequestParam(name="limit", defaultValue = "3") Integer limit) {
+        Pageable pageable = PageRequest.of(0, limit);
         String field;
         if (!filter.isEmpty() && !sorter.isEmpty()){
-            return this.productService.filterByAndSort(filter, sorter);
+            return this.productService.filterByAndSort(filter, sorter, pageable).getContent();
         } else if(!filter.isEmpty()){
-            return this.productService.filterBy(filter);
+            return this.productService.filterBy(filter, pageable).getContent();
         }else if(!sorter.isEmpty()){
-
+            return this.productService.sortBy(sorter, pageable).getContent();
         }
-        return this.productRep.findAll();
+        return this.productRep.findAll(pageable).getContent();
     }
 
     @RequestMapping(value="/create")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
