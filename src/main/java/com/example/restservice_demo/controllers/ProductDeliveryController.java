@@ -4,6 +4,8 @@ import com.example.restservice_demo.entities.ProductDelivery;
 import com.example.restservice_demo.repositories.ProductDeliveryRepository;
 import com.example.restservice_demo.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
@@ -30,7 +32,8 @@ public class ProductDeliveryController {
     public void createProductDelivery(@RequestParam("name") String name, @RequestParam(name = "productName") String productName, @RequestParam(name = "amount") long amount) {
         ProductDelivery d;
         if (name.length() <=255 && amount >0) {
-            Product p = this.productRep.findByName(productName);
+            Page<Product> p1 = this.productRep.findByName(productName, PageRequest.of(0, 100));
+            Product p = p1.getContent().get(0);
             //System.out.println(p.getAmount());
             if (p.getAmount() == 0){
                 p.setInSight(true);
@@ -48,7 +51,7 @@ public class ProductDeliveryController {
             //System.out.println("update"+ name);
             switch (property) {
                 case "productName":
-                    d.get().setProduct(this.productRep.findByName(value));
+                    d.get().setProduct(this.productRep.findByName(value, PageRequest.of(0, 100)).getContent().get(0));
                     this.deliveryRep.save(d.get());
                     break;
                 case "amount":

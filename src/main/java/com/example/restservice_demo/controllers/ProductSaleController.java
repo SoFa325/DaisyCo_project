@@ -4,6 +4,7 @@ import com.example.restservice_demo.entities.ProductSale;
 import com.example.restservice_demo.repositories.ProductRepository;
 import com.example.restservice_demo.repositories.ProductSaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class ProductSaleController {
     public void createProductSale(@RequestParam("name") String name, @RequestParam(name = "productName") String productName, @RequestParam(name = "amount") long amount) {
         ProductSale s;
         if (name.length() <=255 && amount >0) {
-            Product p = this.productRep.findByName(productName);
+            Product p = this.productRep.findByName(productName, PageRequest.of(0, 100)).getContent().get(0);
             long a = p.getAmount()-amount;
             if (a>=0) {
                 p.setInSight(a>0);
@@ -49,7 +50,7 @@ public class ProductSaleController {
             //System.out.println("update"+ name);
             switch (property) {
                 case "productName":
-                    s.get().setProduct(this.productRep.findByName(value));
+                    s.get().setProduct(this.productRep.findByName(value, PageRequest.of(0, 100)).getContent().get(0));
                     this.saleRep.save(s.get());
                     break;
                 case "amount":

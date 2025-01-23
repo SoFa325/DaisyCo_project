@@ -1,8 +1,13 @@
 package com.example.restservice_demo.controllers;
 import com.example.restservice_demo.entities.Product;
 import com.example.restservice_demo.repositories.ProductRepository;
+import com.example.restservice_demo.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -10,6 +15,8 @@ import java.util.Optional;
 public class ProductController {
     @Autowired
     private ProductRepository productRep;
+    @Autowired
+    private ProductService productService;
 
     @RequestMapping(value="/getProduct", produces="application/json")
     @ResponseBody
@@ -18,47 +25,17 @@ public class ProductController {
     }
     @RequestMapping(value="/get", produces="application/json")
     @ResponseBody
-    public Iterable<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter) {
+    public List<Product> getProducts(@RequestParam(name = "filterby", defaultValue = "") String filter, @RequestParam(name = "sortby", defaultValue = "") String sorter, @RequestParam(name="limit", defaultValue = "100") Integer limit) {
+        Pageable pageable = PageRequest.of(0, limit);
         String field;
         if (!filter.isEmpty() && !sorter.isEmpty()){
-            //TODO
+            return this.productService.filterByAndSort(filter, sorter, pageable).getContent();
         } else if(!filter.isEmpty()){
-            String[] s = filter.split("!");
-            if (s.length != 2){
-                return null;
-            }
-            filter = s[0];
-            field = s[1];
-            try {
-                switch (filter) {
-                    case "name":
-                        return this.productRep.findByNameContaining(s[1]);
-                    case "price":
-                        if (field.charAt(0) == '>') {
-                            return this.productRep.findByPriceGreaterThan(Double.parseDouble(field.substring(1)));
-                        } else if (field.charAt(0) == '<') {
-                            return this.productRep.findByPriceLessThan(Double.parseDouble(field.substring(1)));
-                        } else {
-                            return this.productRep.findByPrice(Double.parseDouble(field));
-                        }
-                    case "in_sight":
-                        return this.productRep.findByInSight(Boolean.parseBoolean(field));
-                }
-            } catch(NumberFormatException e){
-                System.out.println(e);
-                return null;
-            }
+            return this.productService.filterBy(filter, pageable).getContent();
         }else if(!sorter.isEmpty()){
-            switch (sorter) {
-                case "name":
-                    return this.productRep.findByOrderByNameAsc();
-                case "price":
-                    return this.productRep.findByOrderByPriceAsc();
-                default:
-                    return null;
-            }
+            return this.productService.sortBy(sorter, pageable).getContent();
         }
-        return this.productRep.findAll();
+        return this.productRep.findAll(pageable).getContent();
     }
 
     @RequestMapping(value="/create")//http://localhost:8080/create?name=cavier&description=kvkvk&price=120&in_sight=true
@@ -93,10 +70,6 @@ public class ProductController {
                     break;
                 case "in_sight":
                     p.get().setInSight(Boolean.parseBoolean(value));
-                    this.productRep.save(p.get());
-                    break;
-                case "amount":
-                    p.get().setAmount(Long.parseLong(value));
                     this.productRep.save(p.get());
                     break;
             }
